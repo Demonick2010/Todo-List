@@ -1,0 +1,73 @@
+﻿@*Устанавливаем маршрут по адресу localhost/todo*@
+@page "/todo"
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+
+            <h2 class="text-center">Todo (@todos.Count(item => !item.IsDone))</h2>
+
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Is Done</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                @foreach (var item in todos)
+                {
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div style="@(item.IsDone ? "color: green; text-decoration: line-through;" : "color: red;")">
+                                    @item.Title
+                                </div>
+                            </td>
+                            <td>
+                                @*@item.IsDone*@
+                                <input type="checkbox" @bind="item.IsDone" />
+                            </td>
+                            <td>
+                                <button class="btn btn-danger" @onclick="(() => DeleteTodo(item))">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                }
+            </table>
+
+            <div class="row">
+                <div class="col">
+                    <input class="form-control" placeholder="Type something todo" @bind="newTodo" />
+                </div>
+                <div class="col">
+                    <button class="btn btn-success" @onclick="AddTodo">Add todo</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private IList<TodoItem> todos = new List<TodoItem>();
+
+    private string newTodo;
+
+    // Добавляем обработчик нажатия кнопки добавления
+    private void AddTodo()
+    {
+        // Logic... (1)
+        // (2)
+        if(!string.IsNullOrWhiteSpace(newTodo))
+        {
+            todos.Add(new TodoItem {Title = newTodo});
+            newTodo = string.Empty;
+        }
+    }
+
+    private void DeleteTodo(TodoItem deleteItem)
+    {
+        todos.Remove(deleteItem);
+    }
+}
