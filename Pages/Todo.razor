@@ -1,4 +1,6 @@
-﻿@*Устанавливаем маршрут по адресу localhost/todo*@
+﻿@inject Todo_List.Data.Repository.IRepository repository;
+
+@*Устанавливаем маршрут по адресу localhost/todo*@
 @page "/todo"
 
 <div class="container-fluid">
@@ -25,11 +27,17 @@
                                 </div>
                             </td>
                             <td>
-                                @*@item.IsDone*@
-                                <input type="checkbox" @bind="item.IsDone" />
+                                @if (!item.IsDone)
+                                {
+                                    <input type="checkbox" value="@item.IsDone" @onchange="(() => StatusChanged(item))" />
+                                }
+                                else
+                                {
+                                    <input type="checkbox" checked value="@item.IsDone" @onchange="(() => StatusChanged(item))" />
+                                }
                             </td>
                             <td>
-                                <button class="btn btn-danger" @onclick="(() => DeleteTodo(item))">Delete</button>
+                                <button class="btn btn-danger" @onclick="(() => DeleteTodo(item.Id))">Delete</button>
                             </td>
                         </tr>
                     </tbody>
@@ -49,25 +57,39 @@
     </div>
 </div>
 
-@code {
-    private IList<TodoItem> todos = new List<TodoItem>();
+@code {      
+
+    private IEnumerable<TodoItem> todos = new List<TodoItem>();
+
+    protected override void OnInitialized()
+    {
+        todos = repository.GetAllItems();
+    }
 
     private string newTodo;
 
     // Добавляем обработчик нажатия кнопки добавления
     private void AddTodo()
     {
-        // Logic... (1)
-        // (2)
         if(!string.IsNullOrWhiteSpace(newTodo))
         {
-            todos.Add(new TodoItem {Title = newTodo});
+            //todos.Add(new TodoItem {Title = newTodo});
+
+            repository.AddTodo(newTodo);
+
             newTodo = string.Empty;
         }
     }
 
-    private void DeleteTodo(TodoItem deleteItem)
+    private void DeleteTodo(int id)
     {
-        todos.Remove(deleteItem);
+        //todos.Remove(deleteItem);
+        repository.DeleteItem(id);
+    }
+
+    private void StatusChanged(TodoItem chengedItem)
+    {
+        chengedItem.IsDone = !chengedItem.IsDone;
+        repository.ValueChenged(chengedItem);
     }
 }

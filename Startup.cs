@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Todo_List.Data;
+using Todo_List.Data.Repository;
 
 namespace Todo_List
 {
@@ -26,8 +28,17 @@ namespace Todo_List
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            // Добавляем контекст данных Entity Framework
+            services.AddDbContextPool<DB>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("AppDb"));
+            });
+
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            services.AddScoped<IRepository, SQLRepository>();
+
             services.AddSingleton<WeatherForecastService>();
         }
 
